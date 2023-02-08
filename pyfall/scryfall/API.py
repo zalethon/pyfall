@@ -6,8 +6,12 @@ from enum import Enum
 
 SCRYFALL_SCHEME = "https"
 SCRYFALL_NETLOC = "api.scryfall.com"
+
 class StrPrototypes(Enum):
     VALUEERROR = "{} must be one of {}; we got {}."
+
+    def format(self, *args, **kwargs):
+        return self.value.format(*args, **kwargs)
 
 # def choosecall(*, passed_keys, valid_keywords, keyword_calls):
 #     if len(passed_keys.keys()) == 0:

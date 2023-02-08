@@ -1,6 +1,31 @@
 from pyfall.scryfall.API import StrPrototypes, callapi
 from pyfall.scryobject import processapiresponse, scryObject
 
+SET_TYPES = [
+    "core",
+    "expansion",
+    "masters",
+    "alchemy",
+    "masterpiece",
+    "arsenal",
+    "from_the_vault",
+    "spellbook",
+    "premium_deck",
+    "duel_deck",
+    "draft_innovation",
+    "treasure_chest",
+    "commander",
+    "planechase",
+    "archenemy",
+    "vanguard",
+    "funny",
+    "starter",
+    "box",
+    "promo",
+    "token",
+    "memorabilia",
+]
+
 def callsets(code:str|None=None, type:str|None=None, **kwargs) -> scryObject:
     """Calls /sets, /sets/:code, /sets/:id, or /sets/tcgplayer/:id
     
