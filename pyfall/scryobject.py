@@ -3,7 +3,8 @@ from urllib.parse import urlsplit
 import requests
 
 import pyfall.errors
-import pyfall.scryapi
+import pyfall.scryfall
+from pyfall.scryfall.API import StrPrototypes
 
 class scryObject:
     def __init__(self, data: dict):
@@ -16,10 +17,10 @@ class scryObject:
         if uri in dir(self):
             # geturi('search_uri') will work, if there's a search_uri on this object
             uri = getattr(self, uri)
-        if urlsplit(uri).netloc != pyfall.scryapi.scryfall_netloc:
+        if urlsplit(uri).netloc != pyfall.scryfall.API.SCRYFALL_NETLOC:
             return requests.get(uri).content
         else:
-            return processapiresponse(pyfall.scryapi.callapi(uri))
+            return processapiresponse(pyfall.scryfall.API.callapi(uri))
     
     def hasscryattr(self, name):
         return name in self.scryfall_attributes
@@ -58,7 +59,7 @@ class scryCard(scryObject):
     def getimage(self, type:str = 'large') -> bytes:
         valid_types = ['png', 'border_crop', 'art_crop', 'large', 'normal', 'small']
         if type.lower() not in valid_types:
-            raise ValueError("Specified type must be one of {0}".format(valid_types))
+            raise ValueError(StrPrototypes.VALUEERROR.format("type", valid_types, type))
         if self.image_status == "missing":
             raise pyfall.errors.RequestError("This card has no available image.")
         try:
