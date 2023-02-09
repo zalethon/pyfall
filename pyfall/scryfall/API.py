@@ -46,8 +46,8 @@ def callapi(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> r
     
     # Set default parameters -- the API sets these of course, but let's do it here
     # too for visibility.
-    defaults = {"version":"large","face":""}
+    payload = {"version":"large","face":""}
     override = {"format":"json", "pretty":False}
-    payload = defaults.update(kwargs)
+    payload.update(kwargs)
     payload.update(override)
     return requests.get(pathquery, params=payload)
