@@ -3,6 +3,7 @@ import urllib.parse
 import pyfall.errors
 import pyfall.scryobject
 from enum import Enum
+import time
 
 SCRYFALL_SCHEME = "https"
 SCRYFALL_NETLOC = "api.scryfall.com"
@@ -47,7 +48,12 @@ def callapi(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> r
     # Set default parameters -- the API sets these of course, but let's do it here
     # too for visibility.
     payload = {"version":"large","face":""}
+    # We're never gonna want pretty=TRUE, and for now let's stick with json
     override = {"format":"json", "pretty":False}
     payload.update(kwargs)
     payload.update(override)
+    # I'm not planning on doing async stuff rn, and figuring out timing seems like a headache.
+    # For my purposes, as not to overwhelm scryfall, this is enough...
+    time.sleep(0.1)
+    # TODO: does requests do URL encoding automatically? We should encode it if not
     return requests.get(pathquery, params=payload)
