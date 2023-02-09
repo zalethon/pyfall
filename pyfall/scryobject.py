@@ -1,6 +1,8 @@
 from urllib.parse import urlsplit
+from io import BytesIO
 
 import requests
+from PIL import Image
 
 import pyfall.errors
 import pyfall.scryfall
@@ -59,6 +61,7 @@ class scrySet(scryObject):
 
     def getsvgicon(self) -> bytes:
         """Download this set's SVG Icon for manipulation or saving."""
+        # TODO: image encoding?
         return self.geturi('icon_svg_uri')
     
     def searchcards(self, **kwargs):
@@ -84,16 +87,19 @@ class scryCard(scryObject):
         return "{1:<5} #{2:>3}. {3}".format(self.set_name, self.set, self.collector_number, self.name)
 
     def getimage(self, type:str = 'large', **kwargs) -> bytes:
+        """Calls the API with this card's image_uri."""
         valid_types = ['png', 'border_crop', 'art_crop', 'large', 'normal', 'small']
         if type.lower() not in valid_types:
             raise ValueError(StrPrototypes.VALUEERROR.format("type", valid_types, type))
         if self.image_status == "missing":
             raise pyfall.errors.RequestError("This card has no available image.")
         try:
-            image = self.geturi(self.image_uris[type], **kwargs)
+            image = Image.open(BytesIO(self.geturi(self.image_uris[type], **kwargs)))
         except AttributeError:
             if self.layout in ["transforming", "modal_dfc", "reversible_card"]:
-                raise pyfall.errors.AmbiguityError("This card has faces on both sides. Hint: scryCardFace is a subclass of scryCard")
+                raise pyfall.errors.AmbiguityError("This card has faces on both sides. Hint: scryCardFace also has a getimage() method")
+            else:
+                raise
         return image
     
     def getset(self, **kwargs):
