@@ -1,3 +1,5 @@
+STR_VALUEERROR = "`{}` must be one of {}; we got '{}'."
+
 class APIError(Exception):
     """An error returned by Scryfall itseslf.
     

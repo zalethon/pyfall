@@ -8,11 +8,11 @@ import time
 SCRYFALL_SCHEME = "https"
 SCRYFALL_NETLOC = "api.scryfall.com"
 
-class StrPrototypes(Enum):
-    VALUEERROR = "{} must be one of {}; we got {}."
+# class StrPrototypes(Enum):
+#     VALUEERROR = "{} must be one of {}; we got {}."
 
-    def format(self, *args, **kwargs):
-        return self.value.format(*args, **kwargs)
+#     def format(self, *args, **kwargs):
+#         return self.value.format(*args, **kwargs)
 
 # def choosecall(*, passed_keys, valid_keywords, keyword_calls):
 #     if len(passed_keys.keys()) == 0:
@@ -24,7 +24,7 @@ class StrPrototypes(Enum):
 #             call = keyword_calls[passed_keys.keys()[0]]
 #     return call
 
-def callapi(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> requests.Response:
+def apiget(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> requests.Response:
     """Uses a SplitResult, or a string, to make a call to the API.
         
         This eturns an open stream! Be sure to close it, or use the result as

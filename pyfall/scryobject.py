@@ -5,8 +5,8 @@ import requests
 from PIL import Image
 
 import pyfall.errors
-import pyfall.scryfall
-from pyfall.scryfall.API import StrPrototypes
+from .scryfall.util import getscryobject, validate_standard_params
+from .scryfall.API import SCRYFALL_NETLOC
 
 class scryObject:
     def __init__(self, data: dict):
@@ -22,10 +22,10 @@ class scryObject:
         if uri in dir(self):
             # geturi('search_uri') will work, if there's a search_uri on this object
             uri = getattr(self, uri)
-        if urlsplit(uri).netloc != pyfall.scryfall.API.SCRYFALL_NETLOC:
+        if urlsplit(uri).netloc != SCRYFALL_NETLOC:
             return requests.get(uri).content
         else:
-            return processapiresponse(pyfall.scryfall.API.callapi(uri, **kwargs))
+            return getscryobject(uri, **kwargs)
     
     def hasscryattr(self, name):
         return name in self.scryfall_attributes
@@ -86,20 +86,15 @@ class scryCard(scryObject):
     def __str__(self):
         return "{1:<5} #{2:>3}. {3}".format(self.set_name, self.set, self.collector_number, self.name)
 
-    def getimage(self, type:str = 'large', **kwargs) -> bytes:
+    def getimage(self, version:str="large") -> bytes:
         """Calls the API with this card's image_uri."""
-        valid_types = ['png', 'border_crop', 'art_crop', 'large', 'normal', 'small']
-        if type.lower() not in valid_types:
-            raise ValueError(StrPrototypes.VALUEERROR.format("type", valid_types, type))
+        payload = {"version":version}
+        validate_standard_params(payload)
         if self.image_status == "missing":
             raise pyfall.errors.RequestError("This card has no available image.")
-        try:
-            image = Image.open(BytesIO(self.geturi(self.image_uris[type], **kwargs)))
-        except AttributeError:
-            if self.layout in ["transforming", "modal_dfc", "reversible_card"]:
-                raise pyfall.errors.AmbiguityError("This card has faces on both sides. Hint: scryCardFace also has a getimage() method")
-            else:
-                raise
+        if self.layout in ["transforming", "modal_dfc", "reversible_card"]:
+            raise pyfall.errors.AmbiguityError("This card has faces on both sides. Hint: scryCardFace also has a getimage() method")
+        image = Image.open(BytesIO(self.geturi(self.image_uris[payload["version"]])))
         return image
     
     def getset(self, **kwargs):
