@@ -25,17 +25,19 @@ class StrPrototypes(Enum):
 
 def callapi(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> requests.Response:
     """Uses a SplitResult, or a string, to make a call to the API.
-    
-    This eturns an open stream! Be sure to close it, or use the result as
-    a context manager.
+        
+        This eturns an open stream! Be sure to close it, or use the result as
+        a context manager.
 
-    Will only make calls to https://api.scryfall.com -- any other scheme or
-    netloc will be overwritten.
-    
-    kwargs will be treated as parameters to send with the API request.
-    If a parameter is included in both the call and the kwargs, the
-    one from kwargs will generally overrule the one from the call.
-    (this is HTTP or API behaviour; kwargs are appended to the end of params)"""
+        Will only make calls to https://api.scryfall.com -- any other scheme or
+        netloc will be overwritten.
+        
+        kwargs will be treated as parameters to send with the API request.
+        'format' and 'pretty' parameters will be ignored.
+        If a parameter is included in both the call and the kwargs, the
+        one from kwargs will generally overrule the one from the call.
+        (this is HTTP or API behaviour; kwargs are appended to the end of params)
+    """
     if type(call) == str:
         call = urllib.parse.urlsplit(call)
     if call.netloc not in [SCRYFALL_NETLOC, ""]:
@@ -44,6 +46,8 @@ def callapi(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> r
     
     # Set default parameters -- the API sets these of course, but let's do it here
     # too for visibility.
-    payload = {"format":"json","version":"large","face":""}
-    payload.update(kwargs)
+    defaults = {"version":"large","face":""}
+    override = {"format":"json", "pretty":False}
+    payload = defaults.update(kwargs)
+    payload.update(override)
     return requests.get(pathquery, params=payload)
