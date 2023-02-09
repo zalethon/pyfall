@@ -1,17 +1,21 @@
 import pyfall.errors
 import pyfall.scryobject
-from pyfall.scryfall.API import StrPrototypes, callapi
+from .API import callapi
+from .util import validate_kwargs, validate_param_value
 
-def search(*, q: str,
-                   unique: str='cards',
-                   order: str='name',
-                   dir: str='auto',
-                   include_extras: bool=False,
-                   include_multilingual: bool=False,
-                   include_variations: bool=False,
-                   page: int=1,
-                   **kwargs
-                   ) -> pyfall.scryobject.scryList:
+def search(q, **kwargs) -> pyfall.scryobject.scryList:
+    valid_keywords = [
+        'q',
+        'unique',
+        'order',
+        'dir',
+        'include_extras',
+        'include_multilingual',
+        'include_variations',
+        'page',
+        'format',
+        'pretty'
+    ]
     valid_unique = ['cards', 'art', 'prints']
     valid_order = [
         'name',
@@ -31,21 +35,32 @@ def search(*, q: str,
         'review',
     ]
     valid_dir = ['auto', 'asc', 'desc']
-    if unique not in valid_unique:
-        raise ValueError(StrPrototypes.VALUEERROR.format("unique",valid_unique,unique))
-    if order not in valid_order:
-        raise ValueError(StrPrototypes.VALUEERROR.format("order", valid_order, order))
-    if dir not in valid_dir:
-        raise ValueError(StrPrototypes.VALUEERROR.format("dir", valid_dir, dir))
-    payload = {
-        'q':q,
-        'unique':unique,
-        'order':order,
-        'dir':dir,
-        'include_extras':include_extras,
-        'include_multilingual':include_multilingual,
-        'include_variations':include_variations,
-        'page':page,
-    }
+    
+    payload = validate_kwargs(kwargs, valid_keywords)
+    payload.update({"q":q})
+
+    validate_param_value("unique", payload, valid_unique)
+    validate_param_value("order", payload, valid_order)
+    validate_param_value("dir", payload, valid_dir)
 
     return pyfall.scryobject.processapiresponse(callapi("/cards/search", **payload))
+
+def named(**kwargs):
+    valid_keywords = ['exact', 'fuzzy', 'set', 'face', 'version', 'pretty']
+    payload = validate_kwargs(kwargs, valid_keywords)
+
+    return pyfall.scryobject.processapiresponse(callapi("/cards/named", **payload))
+
+def random(**kwargs):
+    valid_keywords = ['q', 'format', 'face', 'version', 'pretty']
+    payload = validate_kwargs(kwargs, valid_keywords)
+    return pyfall.scryobject.processapiresponse(callapi("/cards/random", **payload))
+
+def code(code, number, lang=None, **kwargs):
+    valid_keywords = ['format', 'face', 'version', 'pretty']
+    payload = validate_kwargs(kwargs, valid_keywords)
+    if lang != None:
+        path = '/cards/{}/{}/{}'.format(code, number, lang)
+    else:
+        path = '/cards/{}/{}'.format(code, number)
+    return pyfall.scryobject.processapiresponse(callapi(path, **payload))

@@ -1,5 +1,5 @@
-from pyfall.scryfall.API import StrPrototypes, callapi
-from pyfall.scryobject import processapiresponse, scryObject
+from .API import StrPrototypes, callapi
+from ..scryobject import processapiresponse, scryObject
 
 SET_TYPES = [
     "core",
