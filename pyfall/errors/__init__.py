@@ -14,3 +14,8 @@ class RequestError(Exception):
     """A Scryfall-related error caused by something this library, or the user, did."""
     def __init__(self, *args):
         super().__init__(*args)
+
+class AmbiguityError(Exception):
+    """An error related to this program's inability to determine which of multiple things to pick."""
+    def __init__(self, *args):
+        super().__init__(*args)
