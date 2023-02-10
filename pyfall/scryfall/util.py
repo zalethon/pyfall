@@ -1,6 +1,4 @@
 from ..errors import STR_VALUEERROR
-from .. import scryobject
-from .API import apiget
 
 def validate_kwargs(kwarg_dict:dict, valid_keywords:list) -> dict:
     for keyword in kwarg_dict:
@@ -29,6 +27,9 @@ def validate_standard_params(kwarg_dict, valid_format=['json', 'csv', 'text', 'i
     validate_param_value("face", kwarg_dict, valid_face)
     validate_param_value("format", kwarg_dict, valid_format)
 
-# Can't typehint this one's output -- it returns scryobject.scryObject, and that's a circular import
-def getscryobject(call:str, **kwargs):
-    return scryobject.processapiresponse(apiget(call, **kwargs))
+def sizeof_fmt(num:float, suffix='B'):
+    for unit in ['','kB','MB','GB','TB','PB','EB','ZB', 'YB', 'RB', 'QB']:
+        if abs(num) < 1024.00:
+            return "%3.1f %s%s" % (num, unit, suffix)
+        num = num/1024.00
+    raise ValueError("There's nothing bigger than 1023QB you liar")
