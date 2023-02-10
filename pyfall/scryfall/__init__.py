@@ -1,1 +1,1 @@
-from . import sets, api, cards, bulkdata
+from . import sets, cards, bulkdata

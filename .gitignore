@@ -154,3 +154,9 @@ Untitled.ipynb
 test.svg
 test.py
 .gitignore
+doc/classes.dot
+doc/classes.mmd
+doc/classes.html
+doc/packages.dot
+doc/packages.mmd
+doc/packages.html

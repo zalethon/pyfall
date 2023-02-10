@@ -1,5 +1,4 @@
-from ..scryobject import processapiresponse
-from .api import apiget
+from pyfall.scryobject import getscryobject
 
 def bulk_data():
-    return processapiresponse(apiget("bulk-data"))
+    return getscryobject("bulk-data")

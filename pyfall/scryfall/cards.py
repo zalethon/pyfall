@@ -1,6 +1,6 @@
-from ..scryobject import scryList, scryCard, getscryobject
-from ..util import validate_param_value, validate_standard_params
-from .. import errors
+from pyfall.scryobject import scryList, scryCard, getscryobject
+from pyfall.util import validate_param_value, validate_standard_params
+import pyfall.errors
 
 def search(q:str,
            unique:str="cards",
@@ -69,7 +69,7 @@ def named(exact:str=None,
         "pretty":pretty,
     }
     if exact == None and fuzzy == None:
-        raise errors.RequestError("Either `exact` or `fuzzy` need to be set.")
+        raise pyfall.errors.RequestError("Either `exact` or `fuzzy` need to be set.")
     validate_standard_params(payload, valid_format)
     return getscryobject("/cards/named", **payload)
 
@@ -105,7 +105,7 @@ def random(q:str=None,
 
 def collection(*args, **kwargs):
 # /cards/collection is a POST method -- will probably do this later
-    raise errors.RequestError("/cards/collection is a POST method, and not yet implemented here.")
+    raise pyfall.errors.RequestError("/cards/collection is a POST method, and not yet implemented here.")
 
 def code(code:str,
          number:str|int,
@@ -169,6 +169,6 @@ def tcgplayer(id:str, format:str='json', face:str=None, version:str='large', pre
 def cardmarket(id:str, format:str='json', face:str=None, version:str='large', pretty:bool=False):
     return typeid(id, 'cardmarket', format, face, version, pretty)
 
-def scryid(id:str, format:str='json', face:str=None, version:str='large', pretty:bool=False):
+def id(id:str, format:str='json', face:str=None, version:str='large', pretty:bool=False):
     return typeid(id, None, format, face, version, pretty)
 

@@ -1,4 +1,4 @@
-from .errors import STR_VALUEERROR
+from pyfall.errors import STR_VALUEERROR
 
 def validate_kwargs(kwarg_dict:dict, valid_keywords:list) -> dict:
     for keyword in kwarg_dict:

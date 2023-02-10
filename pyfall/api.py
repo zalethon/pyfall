@@ -1,8 +1,7 @@
-import requests
-import urllib.parse
 import pyfall.errors
-import pyfall.scryobject
-from enum import Enum
+
+import urllib.parse
+import requests
 import time
 
 SCRYFALL_SCHEME = "https"
