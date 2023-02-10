@@ -1,4 +1,4 @@
-from pyfall.scryobject import scryList, scryCard, getscryobject
+from pyfall.scryobject import scryList, scryCard, getapiuri
 from pyfall.util import validate_param_value, validate_standard_params
 import pyfall.errors
 
@@ -49,7 +49,7 @@ def search(q:str,
     validate_param_value("order", payload, valid_order)
     validate_param_value("dir", payload, valid_dir)
 
-    return getscryobject("/cards/search", **payload)
+    return getapiuri("/cards/search", **payload)
 
 def named(exact:str=None,
           fuzzy:str=None,
@@ -71,7 +71,7 @@ def named(exact:str=None,
     if exact == None and fuzzy == None:
         raise pyfall.errors.RequestError("Either `exact` or `fuzzy` need to be set.")
     validate_standard_params(payload, valid_format)
-    return getscryobject("/cards/named", **payload)
+    return getapiuri("/cards/named", **payload)
 
 def autocomplete(q:str,
                  format:str='json',
@@ -85,7 +85,7 @@ def autocomplete(q:str,
         "include_extras":include_extras
     }
     validate_standard_params(payload, valid_format)
-    return getscryobject("/cards/autocomplete", **payload)
+    return getapiuri("/cards/autocomplete", **payload)
 
 def random(q:str=None,
            format:str='json',
@@ -101,7 +101,7 @@ def random(q:str=None,
         "pretty":pretty,
     }
     validate_standard_params(payload, valid_format)
-    return getscryobject("/cards/random", **payload)
+    return getapiuri("/cards/random", **payload)
 
 def collection(*args, **kwargs):
 # /cards/collection is a POST method -- will probably do this later
@@ -129,7 +129,7 @@ def code(code:str,
         path = '/cards/{}/{}/{}'.format(code, number, lang)
     else:
         path = '/cards/{}/{}'.format(code, number)
-    return getscryobject(path, **payload)
+    return getapiuri(path, **payload)
 
 def typeid(id:str,
            type:str=None,
@@ -152,7 +152,7 @@ def typeid(id:str,
         path = '/cards/{}'.format(id)
     else:
         path = '/cards/{}/{}'.format(type, id)
-    return getscryobject(path, **payload)
+    return getapiuri(path, **payload)
 
 def multiverse(id:str, format:str='json', face:str=None, version:str='large', pretty:bool=False):
     return typeid(id, 'multiverse', format, face, version, pretty)

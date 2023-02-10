@@ -1,5 +1,5 @@
 from pyfall.util import validate_param_value
-from pyfall.scryobject import scryObject, getscryobject
+from pyfall.scryobject import scryObject, getapiuri
 
 # Not available as a catalog; check scryfall docs for up-to-date list
 # Good a/o February 2023
@@ -53,7 +53,7 @@ def callsets(**kwargs) -> scryObject:
     validate_param_value("type", kwarg_dict, valid_types)
     call = type_calls[kwarg_dict["type"]].format(kwarg_dict["code"])
 
-    return getscryobject(call, **kwarg_dict)
+    return getapiuri(call, **kwarg_dict)
 
 def sets(code:str|None=None, **kwargs):
     return callsets(code, **kwargs)
