@@ -92,7 +92,7 @@ def random(q:str=None,
            face:str=None,
            version:str='large',
            pretty:bool=False) -> scryCard:
-    valid_format = 'json', 'text', 'image'
+    valid_format = ['json', 'text', 'image']
     payload = {
         "q":q,
         "format":format,
