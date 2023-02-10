@@ -41,19 +41,19 @@ class scryCard(scryObject):
         setattr(self, "image_{}".format(payload["version"]), image)
         return Image.open(image)
     
-    def getset(self, **kwargs):
+    def getset(self, **kwargs) -> scrySet:
         return self.geturi(self.set_uri, **kwargs)
     
-    def searchsetcards(self, **kwargs):
+    def searchsetcards(self, **kwargs) -> scryList:
         return self.geturi(self.set_search_uri, **kwargs)
 
     def getrulings(self, **kwargs):
         return self.geturi(self.rulings_uri, **kwargs)
 
 class scryCardFace(scryObject):
-    def getimage(self, version:str='large'):
+    def getimage(self, version:str='large') -> bytes:
         return scryCard.getimage(self, version)
 
 class scryRelatedCard(scryObject):
-    def getcard(self):
+    def getcard(self) -> scryCard:
         return self.geturi(self.uri)
