@@ -1,6 +1,6 @@
 from ..scryobject import scryList, scryCard, getscryobject
-from .util import validate_param_value, validate_standard_params
-import pyfall.errors
+from ..util import validate_param_value, validate_standard_params
+from .. import errors
 
 def search(q:str,
            unique:str="cards",
@@ -69,7 +69,7 @@ def named(exact:str=None,
         "pretty":pretty,
     }
     if exact == None and fuzzy == None:
-        raise pyfall.errors.RequestError("Either `exact` or `fuzzy` need to be set.")
+        raise errors.RequestError("Either `exact` or `fuzzy` need to be set.")
     validate_standard_params(payload, valid_format)
     return getscryobject("/cards/named", **payload)
 
@@ -105,7 +105,7 @@ def random(q:str=None,
 
 def collection(*args, **kwargs):
 # /cards/collection is a POST method -- will probably do this later
-    raise pyfall.errors.RequestError("/cards/collection is a POST method, and not yet implemented here.")
+    raise errors.RequestError("/cards/collection is a POST method, and not yet implemented here.")
 
 def code(code:str,
          number:str|int,

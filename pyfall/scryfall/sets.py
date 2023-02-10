@@ -1,4 +1,4 @@
-from .util import validate_param_value
+from ..util import validate_param_value
 from ..scryobject import scryObject, getscryobject
 
 # Not available as a catalog; check scryfall docs for up-to-date list

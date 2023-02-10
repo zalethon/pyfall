@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import pyfall.errors
 from .scryfall.api import SCRYFALL_NETLOC, apiget
-from .scryfall.util import validate_standard_params, sizeof_fmt
+from .util import validate_standard_params, sizeof_fmt
 
 class scryObject:
     def __init__(self, data: dict):
