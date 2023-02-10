@@ -2,19 +2,17 @@
 Classes and the rest of the library. So we pull in stuff the classes need,
 and we export all of the classes as well as our own factory functionality.
 
-For the scryfall module, this is where the API calls go through.
+For the classes and the scryfall module, this is where API calls go through.
 
 Mostly this is to resolve weird circular dependencies; should make maintenance
 easier too."""
 
 from urllib.parse import urlsplit
-from io import BytesIO
+from io import BufferedRandom
 
 import requests
-from tqdm import tqdm
 
 # These are used by the classes.
-from pyfall.api import SCRYFALL_NETLOC
 from pyfall.util import validate_standard_params, sizeof_fmt
 from pyfall.errors import RequestError, AmbiguityError, APIError
 
@@ -41,7 +39,7 @@ __all__ = [
     'processapiresponse',
     'processjson',
 #    'scryobjectfactory',
-    'getscryobject',
+    'getapiuri',
 ]
 
 def processapiresponse(response: requests.Response) -> scryObject:
@@ -72,21 +70,10 @@ def processjson(jsonlike: dict) -> scryObject:
 """scryobjectfactory is equivalent to scryobjectfactory."""
 scryobjectfactory = processjson
 
-def getscryobject(call:str, **kwargs) -> scryObject:
+def getapiuri(call:str, **kwargs) -> scryObject:
     """Makes a call to the API, and processes it into the right class."""
-    return processapiresponse(pyfall.api.apiget(call, **kwargs))
+    return processapiresponse(pyfall.api.getapiresponse(call, **kwargs))
 
-def geturi(uri:str, *, sizeof:int=None, chunksize:int=1024**2, **kwargs) -> bytes | scryObject:
-    """Makes a call to the API or just downloads bytes."""
-    if urlsplit(uri).netloc != SCRYFALL_NETLOC:
-        buffer = BytesIO()
-        with requests.get(uri, stream=True) as r:
-            if 'content-length' in r.headers:
-                sizeof = r.headers['content-length']
-            for bytes in tqdm(r.iter_content(chunksize),total=(sizeof/chunksize) if sizeof else None):
-                buffer.write(bytes)
-            buffer.seek(0)
-            #contents = buffer.read()
-        return buffer
-    else:
-        return getscryobject(uri, **kwargs)
+def geturi(uri:str, *, sizeof:int=None, chunksize:int=1024**2, **kwargs) -> BufferedRandom:
+    """Downloads bytes to a temp file."""
+    return pyfall.api.getcontents(uri, sizeof=sizeof, chunksize=chunksize, **kwargs)

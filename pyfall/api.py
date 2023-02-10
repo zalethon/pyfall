@@ -1,40 +1,37 @@
+import urllib.parse
+import time
+from io import BufferedRandom
+import tempfile
+
+import requests
+from tqdm import tqdm
+
 import pyfall.errors
 
-import urllib.parse
-import requests
-import time
 
 SCRYFALL_SCHEME = "https"
 SCRYFALL_NETLOC = "api.scryfall.com"
 
-# class StrPrototypes(Enum):
-#     VALUEERROR = "{} must be one of {}; we got {}."
+def geturiresponse(uri:str, **kwargs):
+    """Get a response from a particular URI."""
+    # I'm not planning on doing async stuff rn, and figuring out timing seems like a headache.
+    # For my purposes, as not to overwhelm scryfall, this is enough...
+    time.sleep(0.1)
+    return requests.get(uri, **kwargs)
 
-#     def format(self, *args, **kwargs):
-#         return self.value.format(*args, **kwargs)
-
-# def choosecall(*, passed_keys, valid_keywords, keyword_calls):
-#     if len(passed_keys.keys()) == 0:
-#         call = keyword_calls[None]
-#     else:
-#         if list(passed_keys.keys())[0] not in valid_keywords:
-#             raise ValueError(string_valueerror_notinlist.format("First keyword", valid_keywords, *passed_keys.keys()))
-#         else:
-#             call = keyword_calls[passed_keys.keys()[0]]
-#     return call
-
-def apiget(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> requests.Response:
+def getapiresponse(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> requests.Response:
     """Uses a SplitResult, or a string, to make a call to the API.
         
-        This eturns an open stream! Be sure to close it, or use the result as
-        a context manager.
-
         Will only make calls to https://api.scryfall.com -- any other scheme or
-        netloc will be overwritten.
+        netloc will be overwritten or raise a RequestError.
         
+        `call` can be of either form:
+        '[scheme]api.scryfall.com/cards/random' -or-
+        '/cards/random'
+
         kwargs will be treated as parameters to send with the API request.
         'format' and 'pretty' parameters will be ignored.
-        If a parameter is included in both the call and the kwargs, the
+        If a parameter is included in both the call string and the kwargs, the
         one from kwargs will generally overrule the one from the call.
         (this is HTTP or API behaviour; kwargs are appended to the end of params)
     """
@@ -51,8 +48,22 @@ def apiget(call: str | urllib.parse.SplitResult="/cards/random", **kwargs) -> re
     override = {"format":"json", "pretty":False}
     payload.update(kwargs)
     payload.update(override)
-    # I'm not planning on doing async stuff rn, and figuring out timing seems like a headache.
-    # For my purposes, as not to overwhelm scryfall, this is enough...
-    time.sleep(0.1)
-    # TODO: does requests do URL encoding automatically? We should encode it if not
-    return requests.get(pathquery, params=payload)
+    return geturiresponse(pathquery, params=payload)
+
+def getcontents(uri:str, *, chunksize:int=1024**2, sizeof:int, **kwargs) -> BufferedRandom:
+    """Get the contents returned by a URI. Meant for use with non-API calls.
+    
+    `sizeof` should be the size in bytes; `chunksize` should be the desired chunk size.
+
+    Gets the contents buffered on the hard drive in a temporary file, and tries to guess how long it'll take."""
+    buffer = tempfile.TemporaryFile()
+    if urllib.parse.urlsplit(uri).netloc == SCRYFALL_NETLOC:
+        raise pyfall.errors.RequestError("This should be an getapiuri() calll: {}".format(uri))
+    with geturiresponse(uri, stream=True, **kwargs) as r:
+        if 'content-length' in r.headers:
+            sizeof = int(r.headers['content-length'])
+        for bytes in tqdm(r.iter_content(chunksize),total=(int(sizeof)/(chunksize*8)) if sizeof else None):
+            buffer.write(bytes)
+        buffer.seek(0)
+        #contents = buffer.read()
+    return buffer

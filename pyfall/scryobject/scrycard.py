@@ -37,18 +37,19 @@ class scryCard(scryObject):
             raise pyfall.scryobject.scryobject.RequestError("This card has no available image.")
         if (type(self) == scryCard) and (self.layout in ["transforming", "modal_dfc", "reversible_card"]):
             raise pyfall.scryobject.scryobject.AmbiguityError("This card has faces on both sides. Hint: scryCardFace also has a getimage() method")
-        image = BytesIO(self.geturi(self.image_uris[payload["version"]]))
+        with self.geturi(self.image_uris[payload["version"]]) as fp:
+            image = fp.read()
         setattr(self, "image_{}".format(payload["version"]), image)
-        return Image.open(image)
+        return Image.open(BytesIO(image))
     
     def getset(self, **kwargs) -> scrySet:
-        return self.geturi(self.set_uri, **kwargs)
+        return self.getapiuri(self.set_uri, **kwargs)
     
     def searchsetcards(self, **kwargs) -> scryList:
-        return self.geturi(self.set_search_uri, **kwargs)
+        return self.getapiuri(self.set_search_uri, **kwargs)
 
     def getrulings(self, **kwargs):
-        return self.geturi(self.rulings_uri, **kwargs)
+        return self.getapiuri(self.rulings_uri, **kwargs)
 
 class scryCardFace(scryObject):
     def getimage(self, version:str='large') -> bytes:
@@ -56,4 +57,4 @@ class scryCardFace(scryObject):
 
 class scryRelatedCard(scryObject):
     def getcard(self) -> scryCard:
-        return self.geturi(self.uri)
+        return self.getapiuri(self.uri)

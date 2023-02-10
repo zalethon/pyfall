@@ -1,3 +1,4 @@
+from io import BufferedRandom
 # Need this for class functionality
 import pyfall.scryobject.scryobject
 
@@ -14,23 +15,27 @@ __all__ = [
 
 class scryObject:
     def __init__(self, data: dict):
+        self.scryfall_attributes = list(data.keys())
         for key in data.keys():
             setattr(self, key, data[key])
-        setattr(self, "scryfall_attributes", list(data.keys()))
     
-    def geturi(self, uri: str, *, sizeof=None, chunksize=1024**2, **kwargs) -> 'bytes | scryObject':
-        """Download a URI, or make a call to the API as appropriate.
+    def geturi(self, uri: str, *, sizeof=None, chunksize=1024**2, **kwargs) -> BufferedRandom:
+        """Download a URI to a temporary file.
         
             sizeof is the size of the file we're getting, if we happen to know it
             (as in the case of bulk data)
-
-            Keyword args ignored for non-API URIs.
         """
         # geturi('search_uri') will work, if there's a search_uri on this object
         if uri in dir(self):
             uri = getattr(self, uri)
         return pyfall.scryobject.scryobject.geturi(uri, sizeof=sizeof, chunksize=chunksize, **kwargs)
     
+    def getapiuri(self, uri: str, **kwargs) -> 'scryObject':
+        """Make an API call from a uri, and wrap it in the right class."""
+        if uri in dir(self):
+            uri = getattr(self, uri)
+        return pyfall.scryobject.scryobject.getapiuri(uri, **kwargs)
+
     def hasscryattr(self, name):
         return name in self.scryfall_attributes
         
@@ -52,7 +57,7 @@ class scryList(scryObject):
 
     def getnext(self):
         if self.has_more:
-            return self.geturi('next_page')
+            return self.getapiuri('next_page')
         else:
             raise pyfall.scryobject.scryobject.RequestError("This list has no more pages.")
 
@@ -66,13 +71,15 @@ class scrySet(scryObject):
     def getsvgicon(self) -> bytes:
         """Download this set's SVG Icon for manipulation or saving."""
         # TODO: image encoding?
-        return self.geturi('icon_svg_uri')
+        with self.geturi('icon_svg_uri') as fp:
+            contents = fp.read()
+        return contents
     
-    def searchcards(self, **kwargs):
+    def searchcards(self, **kwargs) -> scryList:
         """Get a paginated list of all of the cards in this set.
         
         Equivalent to a scryfall.cards.search() call"""
-        allsetcards = self.geturi('search_uri', **kwargs)
+        allsetcards = self.getapiuri('search_uri', **kwargs)
         return allsetcards
 
 class scryRuling(scryObject): ...

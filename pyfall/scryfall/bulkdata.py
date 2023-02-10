@@ -1,4 +1,4 @@
-from pyfall.scryobject import getscryobject
+from pyfall.scryobject import getapiuri
 
 def bulk_data():
-    return getscryobject("bulk-data")
+    return getapiuri("bulk-data")
