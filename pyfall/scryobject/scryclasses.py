@@ -1,12 +1,5 @@
-from urllib.parse import urlsplit
-from io import BytesIO
-
 # Need this for class functionality
 import pyfall.scryobject.scryobject
-
-import requests
-from PIL import Image
-from tqdm import tqdm
 
 __all__ = [
     'scryObject',
@@ -33,21 +26,10 @@ class scryObject:
 
             Keyword args ignored for non-API URIs.
         """
+        # geturi('search_uri') will work, if there's a search_uri on this object
         if uri in dir(self):
-            # geturi('search_uri') will work, if there's a search_uri on this object
             uri = getattr(self, uri)
-        if urlsplit(uri).netloc != pyfall.scryobject.scryobject.SCRYFALL_NETLOC:
-            buffer = BytesIO()
-            with requests.get(uri, stream=True) as r:
-                if 'content-length' in r.headers:
-                    sizeof = r.headers['content-length']
-                for bytes in tqdm(r.iter_content(chunksize),total=(sizeof/chunksize) if sizeof else None):
-                    buffer.write(bytes)
-                buffer.seek(0)
-                #contents = buffer.read()
-            return buffer
-        else:
-            return pyfall.scryobject.scryobject.getscryobject(uri, **kwargs)
+        return pyfall.scryobject.scryobject.geturi(uri, sizeof=sizeof, chunksize=chunksize, **kwargs)
     
     def hasscryattr(self, name):
         return name in self.scryfall_attributes
