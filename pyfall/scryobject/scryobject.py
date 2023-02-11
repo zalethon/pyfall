@@ -3,6 +3,7 @@ Classes and the rest of the library. So we pull in stuff the classes need,
 and we export all of the classes as well as our own factory functionality.
 
 For the classes and the scryfall module, this is where API calls go through.
+For the classes and the scryfall module, this is where API calls go through.
 
 Mostly this is to resolve weird circular dependencies; should make maintenance
 easier too."""
@@ -39,6 +40,7 @@ __all__ = [
     'processapiresponse',
     'processjson',
 #    'scryobjectfactory',
+    'getapiuri',
     'getapiuri',
 ]
 
